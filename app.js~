@@ -1,0 +1,230 @@
+// We've added a third and final item to our tab panel - scroll down to see it
+Ext.application({
+    name: 'Sencha',
+    
+    requires: ['Ext.Ajax',
+					'Ext.data.Store',
+					'Ext.TitleBar',
+					'Ext.Toolbar',
+					'Ext.Map',
+					'Ext.dataview.List'    				
+    				],
+
+    launch: function() {
+			Ext.define('Evento', {
+								    extend: 'Ext.data.Model',
+								    config: {
+								        fields: ['evento', 'hora', 'date']
+								    }
+								});
+								
+								var store = Ext.create('Ext.data.Store', {
+								   model: 'Evento',
+								   sorters: 'date',
+								
+								   grouper: {
+								       groupFn: function(record) {
+								           return record.get('data')[0];
+								       }
+								   },
+								
+								   
+								});    
+		
+	    	
+	
+    	
+    	
+        Ext.create("Ext.Container", {
+        		layout: 'card',
+            fullscreen: true,           
+				id: "cont",
+            items: [
+	            	{
+					    xtype: 'titlebar',
+					    cls: 'title',
+					    docked: 'top',
+					  		title: 'PeerSquare Recife',
+							items: [
+								{
+			               cls: 'back',
+			               hidden: true,
+			               ui: 'back',
+			               action: 'back',
+			               align: 'left',
+			               text: 'voltar',
+			           		id: 'voltar'
+			      
+			            },
+						       {
+				               iconCls: 'add',
+				               action: 'settings',
+				               ui: 'normal',
+				               align: 'right'
+				            }
+			            ]				    
+					    
+					    
+					},
+					
+					{
+					    xtype: 'toolbar',				    
+					    cls: 'footer',
+					    ui: 'light',
+					    docked: 'bottom',
+					    html: '<span>Powered by &amp;copy; PeerSquare Recife</span>',
+					    items: [{title: 'oi', cls: 'card', iconCls: 'settings', html: 'oi'}]
+					},
+                {
+                	title: 'Pracas',
+                	xtype: 'map',
+                	useCurrentLocation: true,
+                	mapOptions:{ 
+	          			
+                	},
+                	listeners:{
+	                	maprender : function(component, googleMap, eOpts){
+								                		
+
+
+
+
+
+
+
+
+
+
+
+
+	                		 var client = new Usergrid.Client({
+                orgName:'dehmesquita', // Your Usergrid organization name (or apigee.com username for App Services)
+                appName:'sandbox' // Your Usergrid app name
+            });
+
+            // Make a new "book" collection and read data
+            var options = {
+                type:'eventos',
+                qs:{ql:'order by created DESC'}
+            }
+
+            var eventos;
+
+            client.createCollection(options, function (err, eventos) {
+                if (err) {
+                    alert("Couldn't get the list of books.");
+                } else {
+                    //$('#booklist').empty();
+                    while(eventos.hasNextEntity()) {
+                        var evento = eventos.getNextEntity();
+                        console.log(evento.get('evento'));
+                        //alert(book.get("title")); // Output the title of the book
+                     //   $('#booklist').append("<li data-theme=''><h3>"+book.get('title')+"</h3><p>"+book.get('author')+"</p></li>");
+                    }
+                   // $('#booklist').listview('refresh');
+                }
+            });
+	                		
+							//now we create the Ajax request
+						        Ext.Ajax.request({
+						            //first we give it the URL of the request. take not that this can only be local to the web server
+						            //you are on
+						            url: 'parquespracas.geojson',
+										
+						            //then we define a success method, which is called once the ajax request is successful
+						            success: function(response) {
+												console.log("carregou");
+												var pracas = Ext.decode(response.responseText);
+												for(var i in pracas){
+													for (var j in pracas.features){														
+																var pracaCoords = [];
+																//As coordenadas do  poligono de UMA praca
+																var array = pracas.features[j].geometry.coordinates[0];					
+																for(var i = 0; i < array.length; i++){					
+																	pracaCoords.push(new google.maps.LatLng(array[i][1], array[i][0]));
+																};
+																var id = pracas.features[j].id;
+																praca = new google.maps.Polygon({
+																    paths: pracaCoords,
+																    strokeColor: '#FF0000',
+																    strokeOpacity: 0.8,
+																    strokeWeight: 2,
+																    fillColor: '#FF0000',
+																    fillOpacity: 0.35
+															  	});
+																mostrarId(praca, id);						
+																											
+															  	praca.setMap(googleMap);	
+													};													
+												};	
+												function mostrarId (praca, id) {
+												    google.maps.event.addListener(praca, 'click', function() {
+												       // alert(id);
+												        var options = {
+										                type:'eventos',
+										                qs:{ql:'select * where id_praca = '+id}
+										            }
+										
+										            var eventos;
+										
+										            client.createCollection(options, function (err, eventos) {
+										                if (err) {
+										                    alert("Couldn't get the list of books.");
+										                } else {
+										                    //$('#booklist').empty();
+										                    while(eventos.hasNextEntity()) {
+										                        var evento = eventos.getNextEntity();
+										                        console.log(evento.get('evento'));
+										                        //console.log( Sencha.setActiveItem(1));
+																		store.add([{ evento: evento.get('evento'),   hora: evento.get('hora'),	date: evento.get('data')   }]);
+
+
+
+																	//Ext.getCmp("lista").add(store);
+																	Ext.getCmp("cont").setActiveItem(3);
+																	Ext.getCmp("voltar").show();
+										                       //  Ext.Viewport.setActiveItem(
+														                //xtype: 'list',
+																			
+																			//	  fullscreen: true,
+																		   // itemTpl: '<div class="contact">{evento} <strong>{hora}</strong></div>',
+																		   // store: store
+																	//	   Ext.getCmp("lista")
+																	//	 );
+										                        //alert(book.get("title")); // Output the title of the book
+										                     //   $('#booklist').append("<li data-theme=''><h3>"+book.get('title')+"</h3><p>"+book.get('author')+"</p></li>");
+										                    }
+										                   // $('#booklist').listview('refresh');
+										                }
+										            });
+												    });
+												};					        
+						            },
+						            failure: function() {
+						                //contentView.unmask();
+						                console.log("deu merda");
+						            }
+						        });	  
+	                		
+	                }
+	                	
+	             }
+                	
+                	
+             },
+             { xtype: 'list',
+             	id: 'lista',
+						fullscreen: true,
+						store: store,
+					    itemTpl: '<div class="contact">{evento} <strong>{hora}</strong></div>',
+					
+					    
+						
+						}
+            ]
+        });
+    
+    	
+    	
+    	}
+});
