@@ -2,7 +2,7 @@
     /**
      * The application's namespace, used by Sencha Command to generate classes
      */
-    "name": "MyApp",
+    "name": "PeerSquare",
 
     /**
      * The file path to this application's front HTML document, relative to this app.json file
@@ -40,7 +40,7 @@
      */
     "js": [
         {
-            "path": "../touch/sencha-touch.js",
+            "path": "touch/sencha-touch.js",
             "x-bootstrap": true
         },
         {
@@ -131,5 +131,5 @@
      * Uniquely generated id for this application, used as prefix for localStorage keys.
      * Normally you should never change this value.
      */
-    "id": "3a81c3ca-915a-4f64-8db0-53263c550548"
+    "id": "00e553ba-d756-45d8-84df-baa94aaeb33d"
 }

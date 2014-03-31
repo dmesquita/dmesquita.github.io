@@ -1,48 +1,72 @@
-Ext.define('MyApp.view.Main', {
-    extend: 'Ext.tab.Panel',
+Ext.define('PeerSquare.view.Main', {
+    extend: 'Ext.Container',
     xtype: 'main',
     requires: [
         'Ext.TitleBar',
-        'Ext.Video'
+		'PeerSquare.view.AddEventoView',
+		'PeerSquare.view.TimePickerField',
+		'Ext.Map'
     ],
-    config: {
-        tabBarPosition: 'bottom',
-
+    config: {		
+		direction: 'vertical',
+		layout: 'card',
+		
         items: [
+			{	
+				xtype: 'titlebar',
+				cls: 'title',
+				docked: 'top',
+				title: 'PeerSquare Recife  &nbsp;',
+				items: [
+					{
+						cls: 'back',
+                        hidden: true,
+                        ui: 'back',
+                        action: 'back',
+                        align: 'left',
+                        text: 'voltar'
+                   	},
+                   	{
+						iconCls: 'more',
+						action: 'opcoes',
+						ui: 'plain',
+						align: 'right'						
+					},
+                   	{	
+						cls: 'add',
+						iconCls: 'add',
+                        action: 'add', 
+                        iconMask: true,                               
+                        align: 'right',                                  
+                        hidden: true, 
+                        text: 'evento'					
+					}
+				]
+			},
+			{
+				xtype: 'map',
+				useCurrentLocation: false,
+				mapOptions:{
+					zoom:13,
+					center: new google.maps.LatLng(-8.057445,-34.89139)
+				}
+			},{
+				xtype: 'menuview'
+			},
+			{
+				xtype: 'listaeventosview'
+			},
+			{
+				xtype: 'addeventoview'
+			},
+           
             {
-                title: 'Home Tab',
-                iconCls: 'home',
-
-                styleHtmlContent: true,
-                scrollable: true,
-
-                items: {
-                    docked: 'top',
-                    xtype: 'titlebar',
-                    title: 'Welcome to Sencha Touch 2'
-                },
-
-                html: [
-                   "I changed the default <b>HTML Contents</b> to something different!"
-                ].join("")
-            },
-            {
-                title: 'Woohoo',
-                iconCls: 'action',
-
-                items: [
-                    {
-                        docked: 'top',
-                        xtype: 'titlebar',
-                        title: 'Getting Started'
-                    },
-                    {
-                        xtype: 'video',
-                        url: 'http://av.vimeo.com/64284/137/87347327.mp4?token=1330978144_f9b698fea38cd408d52a2393240c896c',
-                        posterUrl: 'http://b.vimeocdn.com/ts/261/062/261062119_640.jpg'
-                    }
-                ]
-            }
+				xtype: 'toolbar',                   
+                cls: 'footer',
+                ui: 'light',
+                docked: 'bottom',
+                html: '<span>Powered by &#169; PeerSquare Recife</span>'
+			}
         ]
     }
 });
